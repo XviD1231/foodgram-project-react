@@ -41,6 +41,28 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class SubscriptionSerializer(UserSerializer):
+    recipes_count = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+
+    def get_recipes(self, obj):
+        # Делаю так потому что возникают вечные проблемы с
+        # парралельным(цикличным) импортом.
+        from recipe.serializers import RecipeSerializer
+
+        recipes = obj.recipes_author.all()
+        serializer = RecipeSerializer(recipes, many=True, context=self.context)
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        return obj.recipes_author.count()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + (
+            'recipes_count', 'recipes'
+        )
+
+
 class TokenCustomSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField(max_length=254)

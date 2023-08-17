@@ -11,8 +11,8 @@ from rest_framework.status import (
                                    HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
                                    )
-from user.serializers import (UserSerializer, TokenCustomSerializer,
-                              SetPasswordSerializer)
+from user.serializers import (UserSerializer, SubscriptionSerializer,
+                              TokenCustomSerializer, SetPasswordSerializer)
 from user.models import User, Subscription
 from user.services import SubscribtionService
 
@@ -38,7 +38,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], url_path='set_password',
-            permission_classes=[IsAuthenticated])
+            permission_classes=[AllowAny])
     def set_password(self, request):
         user = request.user
         serializer = SetPasswordSerializer(data=request.data)
@@ -75,8 +75,9 @@ class UserViewSet(viewsets.ModelViewSet):
             is_subscribed = SubscribtionService.is_user_subscribed(user,
                                                                    author)
             serializer = UserSerializer(author,
-                                        context={'request': request,
-                                                 'is_subscribed': is_subscribed})
+                                        context={
+                                            'request': request,
+                                            'is_subscribed': is_subscribed})
             return Response(status=HTTP_201_CREATED, data=serializer.data)
 
         if self.request.method == 'DELETE':
@@ -85,16 +86,17 @@ class UserViewSet(viewsets.ModelViewSet):
             SubscribtionService.unsubscribe(user, author=author)
             return Response(status=HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['get'], url_path='subscriptions',
+    @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[IsAuthenticated,])
-    def subscriptions(self, request, pk=None):
-        user = self.get_object()
-        subscriptions = Subscription.objects.filter(user=request.user,
-                                                    author=user)
-        subscriped_users = User.objects.filter(
-            id__in=subscriptions.values_list('author_id', flat=True))
-        serializer = UserSerializer(subscriped_users, many=True,
-                                    context={'request': request})
+    def subscriptions(self, request):
+        user = request.user
+        subscriptions = Subscription.objects.filter(user=user)
+        subscribed_users = User.objects.filter(
+            id__in=subscriptions.values_list(
+             'author_id',
+             flat=True)).prefetch_related('recipes_author')
+        serializer = SubscriptionSerializer(subscribed_users, many=True,
+                                            context={'request': request})
         return Response(status=HTTP_200_OK, data=serializer.data)
 
     @action(detail=True, methods=['get'], url_path='{id}',

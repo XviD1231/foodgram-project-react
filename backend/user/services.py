@@ -14,3 +14,4 @@ class SubscribtionService:
     @classmethod
     def unsubscribe(cls, user, author):
         Subscription.objects.filter(user=user, author=author).delete()
+    
