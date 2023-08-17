@@ -10,4 +10,4 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def total_favorites(self, obj):
         return obj.favorited_by.count()
-    total_favorites.short_description = 'Total Favorites'
+    total_favorites.short_description = 'Всего в избранном'
