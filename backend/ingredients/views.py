@@ -12,8 +12,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [IsAuthorOrReadOnly,]
-    filter_backends = (filters.SearchFilter)
-    search_fields = ('name')
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
 
     @action(detail=False, methods=['get'], url_path='ingredients')
     def ingredients_list(self, request):

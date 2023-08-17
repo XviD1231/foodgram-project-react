@@ -6,11 +6,11 @@ from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.status import (
-                                   HTTP_200_OK,
-                                   HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT,
-                                   HTTP_400_BAD_REQUEST,
-                                   )
+     HTTP_200_OK,
+     HTTP_201_CREATED,
+     HTTP_204_NO_CONTENT,
+     HTTP_400_BAD_REQUEST,
+)
 from user.serializers import (UserSerializer, SubscriptionSerializer,
                               TokenCustomSerializer, SetPasswordSerializer)
 from user.models import User, Subscription
@@ -23,7 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
     @action(detail=False, methods=['post'], url_path='token/login',
-            permission_classes=[AllowAny,])
+            permission_classes=[AllowAny])
     def login(self, request):
         serializer = TokenCustomSerializer(data=request.data)
         if serializer.is_valid():

@@ -27,7 +27,7 @@ from rest_framework.permissions import IsAuthenticated
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly, ]
     filterset_class = RecipeFilter
     pagination_class = PageNumberPagination
 
@@ -35,7 +35,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(detail=True, methods=['patch'], url_path='{id}',
-            permission_classes=[IsAuthorOrReadOnly,])
+            permission_classes=[IsAuthorOrReadOnly])
     def patch_recipes(self, request, pk=None):
         recipes = self.get_object(pk)
         serializer = RecipeSerializer(recipes, data=request.data)
