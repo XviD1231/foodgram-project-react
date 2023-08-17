@@ -6,10 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.status import (
-     HTTP_200_OK,
-     HTTP_201_CREATED,
-     HTTP_204_NO_CONTENT,
-     HTTP_400_BAD_REQUEST,
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
 )
 from user.serializers import (UserSerializer, SubscriptionSerializer,
                               TokenCustomSerializer, SetPasswordSerializer)
@@ -93,8 +93,7 @@ class UserViewSet(viewsets.ModelViewSet):
         subscriptions = Subscription.objects.filter(user=user)
         subscribed_users = User.objects.filter(
             id__in=subscriptions.values_list(
-             'author_id',
-             flat=True)).prefetch_related('recipes_author')
+                'author_id', flat=True)).prefetch_related('recipes_author')
         serializer = SubscriptionSerializer(subscribed_users, many=True,
                                             context={'request': request})
         return Response(status=HTTP_200_OK, data=serializer.data)

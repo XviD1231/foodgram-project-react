@@ -135,7 +135,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             TTFont
             ('Ubuntu',
              'D:/Dev/foodgram-project-react/backend/recipe/fonts/Ubuntu-R.ttf')
-             )
+        )
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{title}.pdf"'
         pdf = canvas.Canvas(response)
