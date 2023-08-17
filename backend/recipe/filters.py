@@ -8,7 +8,7 @@ class RecipeFilter(filters.FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         field_name='is_in_shopping_cart__user',
         method='filter_by_in_shopping_cart'
-        )
+    )
     author = filters.NumberFilter(field_name='author__id', lookup_expr='exact')
     tags = filters.CharFilter(field_name='tags__slug', method='filter_by_tags')
 

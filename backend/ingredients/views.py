@@ -11,7 +11,7 @@ from rest_framework.status import HTTP_200_OK
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = [IsAuthorOrReadOnly,]
+    permission_classes = [IsAuthorOrReadOnly, ]
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
 

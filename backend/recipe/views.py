@@ -44,7 +44,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=HTTP_200_OK)
         return Response({
             'message_error': 'Предоставленные данные не могут быть обработаны.'
-            }, status=HTTP_400_BAD_REQUEST)
+            }, status=HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=True, methods=['delete'], url_path='{id}',
             permission_classes=[IsAuthorOrReadOnly])
@@ -70,7 +71,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 request.user.favorites.add(recipe)
                 return Response({
                     'message': 'Рецепт успешно добавлен в избранное!'
-                    }, status=HTTP_201_CREATED)
+                    }, status=HTTP_201_CREATED
+                    )
             else:
                 return Response({'error_message': 'Для того чтобы добавлять'
                                 'рецепт в избранное вам необходимо'
