@@ -62,7 +62,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=HTTP_200_OK)
 
     @action(detail=True, methods=['post', 'delete'], url_path='subscribe',
-            permission_classes=[IsAuthenticated,])
+            permission_classes=[IsAuthenticated, ])
     def subscribe(self, request, pk=None):
         author = self.get_object()
         user = request.user
@@ -87,7 +87,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'], url_path='subscriptions',
-            permission_classes=[IsAuthenticated,])
+            permission_classes=[IsAuthenticated, ])
     def subscriptions(self, request):
         user = request.user
         subscriptions = Subscription.objects.filter(user=user)
