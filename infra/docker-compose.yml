@@ -1,6 +1,6 @@
 version: '3.3'
 volumes:
-  pg_data:
+  postgres_13.0_data:
   static:
   media:
 
@@ -8,27 +8,33 @@ services:
 
   db:
     image: postgres:13
+    env_file: .env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_13.0_data:/var/lib/postgresql/data/
 
   backend:
+    image: xvid1231/foodgram_backend
     build:
       context: ../backend
       dockerfile: Dockerfile
+    env_file: .env
     volumes:
       - ../backend/:/app/result_build/
       - static:/backend_static
       - media:/app/media
 
   frontend:
+    image: xvid1231/foodgram_frontend
     build:
       context: ../frontend
       dockerfile: Dockerfile
+    env_file: .env
     volumes:
       - ../frontend/:/app/result_build/
 
   nginx:
     image: nginx:1.19.3
+    env_file: .env
     ports:
       - "8070:80"
     volumes:

@@ -89,16 +89,20 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='subscriptions',
             permission_classes=[IsAuthenticated, ])
     def subscriptions(self, request):
-        user = request.user
-        subscriptions = Subscription.objects.filter(user=user)
+        subscriptions = Subscription.objects.filter(user=request.user)
         subscribed_users = User.objects.filter(
-            id__in=subscriptions.values_list(
-                'author_id', flat=True)).prefetch_related('recipes_author')
+            id__in=subscriptions.values_list('author_id', flat=True)
+        )
         serializer = SubscriptionSerializer(subscribed_users, many=True,
                                             context={'request': request})
+
+        page = self.paginate_queryset(serializer.data)
+        if page is not None:
+            return self.get_paginated_response(page)
+
         return Response(status=HTTP_200_OK, data=serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='{id}',
+    @action(detail=True, methods=['get'], url_path='(?P<id>[^/.]+)/$',
             permission_classes=[AllowAny])
     def profile(self, request, pk=None):
         user = self.get_object()

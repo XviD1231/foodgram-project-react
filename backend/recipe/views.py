@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from rest_framework import viewsets
 from reportlab.pdfbase.ttfonts import TTFont
@@ -10,12 +12,11 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK,
                                    HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT,
-                                   HTTP_401_UNAUTHORIZED,
                                    HTTP_400_BAD_REQUEST,
                                    HTTP_403_FORBIDDEN)
-from .serializers import RecipeSerializer
-from .models import Recipe, ShoppingCart
-from recipe.filters import RecipeFilter
+from .serializers import RecipeSerializer, RecipeGETSerializer
+from .models import Recipe, ShoppingCart, Favorited
+from recipe.filters import RecipeFilter, FavoritedFilterBackend
 from user.permissions import IsAuthorOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -26,15 +27,21 @@ from rest_framework.permissions import IsAuthenticated
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     permission_classes = [IsAuthorOrReadOnly, ]
     filterset_class = RecipeFilter
     pagination_class = PageNumberPagination
+    filter_backends = [FavoritedFilterBackend]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeGETSerializer
+        else:
+            return RecipeSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=['patch'], url_path='{id}',
+    @action(detail=True, methods=['patch'], url_path='(?P<id>[^/.]+)/$',
             permission_classes=[IsAuthorOrReadOnly])
     def patch_recipes(self, request, pk=None):
         recipes = self.get_object(pk)
@@ -46,10 +53,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'message_error': 'Предоставленные данные не могут быть обработаны.'
         }, status=HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['delete'], url_path='{id}',
+    @action(detail=True, methods=['delete'], url_path='(?P<id>[^/.]+)/$',
             permission_classes=[IsAuthorOrReadOnly])
     def delete_recipes(self, request, pk=None):
-        author_recipes = Recipe.objects.filter(author=request.user, id=pk)
+        author_recipes = Recipe.objects.filter(author=request.user, pk=pk)
         recipes = author_recipes.first()
         if author_recipes.exists():
             recipes = author_recipes.first()
@@ -63,22 +70,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'], url_path='favorite',
             permission_classes=[IsAuthenticated])
+    @method_decorator(login_required, name='dispatch')
     def favorite_recipe(self, request, pk=None):
         recipe = self.get_object()
+        user = request.user
         if self.request.method == 'POST':
             if request.user.is_authenticated:
-                request.user.favorites.add(recipe)
+                Favorited.objects.get_or_create(user=user, recipe=recipe)
                 return Response({
                     'message': 'Рецепт успешно добавлен в избранное!'
                 }, status=HTTP_201_CREATED)
-            else:
-                return Response({'error_message': 'Для того чтобы добавлять'
-                                'рецепт в избранное вам необходимо'
-                                 'зарегестрироваться.'},
-                                status=HTTP_401_UNAUTHORIZED)
+
         elif self.request.method == 'DELETE':
             if request.user.is_authenticated:
-                request.user.favorites.remove(recipe)
+                Favorited.objects.filter(user=user, recipe=recipe).delete()
                 return Response({
                     'message': 'Рецепт успешно удален из избранного!'
                 }, status=HTTP_204_NO_CONTENT)
@@ -94,27 +99,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def add_or_remove_in_shopping_cart(self, request, pk=None):
         recipe = self.get_object()
         user = request.user
+
+        try:
+            shopping_cart = ShoppingCart.objects.get(user=user)
+        except ShoppingCart.DoesNotExist:
+            shopping_cart = ShoppingCart.objects.create(user=user)
+
         if self.request.method == 'POST':
-            if user == user:
-                shopping_cart = ShoppingCart.objects.create(user=user)
-                shopping_cart.recipes.add(recipe)
-                return Response(
-                    {'message': 'Рецепт успешно добавлен в список покупок'},
-                    status=HTTP_201_CREATED)
+            shopping_cart.recipes.add(recipe)
             return Response(
-                {'error_message': 'Рецепт не существует'},
-                status=HTTP_204_NO_CONTENT)
+                {'message': 'Рецепт успешно добавлен в список покупок'},
+                status=HTTP_201_CREATED)
         elif self.request.method == 'DELETE':
-            if user == user:
-                shopping_cart = ShoppingCart.objects.get(user=user)
-                shopping_cart.recipes.remove(recipe)
-                return Response(
-                    {'message': 'Рецепт из списка покупок успешно удален.'},
-                    status=HTTP_204_NO_CONTENT)
+            shopping_cart.recipes.remove(recipe)
             return Response(
-                {'error_message': 'Невозможно удалить рецепт т.к его не'
-                 'существует'},
-                status=HTTP_400_BAD_REQUEST)
+                {'message': 'Рецепт из списка покупок успешно удален.'},
+                status=HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'], url_path='download_shopping_cart',
             permission_classes=[IsAuthenticated])
@@ -128,7 +128,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients_summary = (
             recipes.values('ingredients__name',
                            'ingredients__measurement_unit')
-            .annotate(total_quantity=Sum('recipe_ingredients__amount'))
+            .annotate(total_quantity=Sum('shopping_carts__amount'))
         )
         title = 'Список покупок'
         pdfmetrics.registerFont(
@@ -136,12 +136,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ('Ubuntu',
              'D:/Dev/foodgram-project-react/backend/recipe/fonts/Ubuntu-R.ttf')
         )
+        X = 40
+        Y = 400
+        FONT_SIZE = 14
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{title}.pdf"'
         pdf = canvas.Canvas(response)
         pdf.setTitle(title)
-        text = pdf.beginText(40, 400)
-        text.setFont('Ubuntu', 14)
+        text = pdf.beginText(X, Y)
+        text.setFont('Ubuntu', FONT_SIZE)
         text.setFillColor(colors.orchid)
         for ingredient in ingredients_summary:
             ingredient_name = ingredient['ingredients__name']

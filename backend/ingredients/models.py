@@ -9,3 +9,4 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингриденты'
+        ordering = ('name',)

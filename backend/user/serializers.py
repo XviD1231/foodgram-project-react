@@ -51,7 +51,8 @@ class SubscriptionSerializer(UserSerializer):
         from recipe.serializers import RecipeSerializer
 
         recipes = obj.recipes_author.all()
-        serializer = RecipeSerializer(recipes, many=True, context=self.context)
+        serializer = RecipeSerializer(recipes, many=True,
+                                      context=self.context)
         return serializer.data
 
     def get_recipes_count(self, obj):
