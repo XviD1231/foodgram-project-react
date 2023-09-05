@@ -138,7 +138,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -168,7 +168,3 @@ DJOSER = {
 }
 
 AUTH_USER_MODEL = 'user.User'
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8070',
-]

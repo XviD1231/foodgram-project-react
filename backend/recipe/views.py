@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -14,6 +14,7 @@ from rest_framework.status import (HTTP_200_OK,
                                    HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST,
                                    HTTP_403_FORBIDDEN)
+
 from .serializers import RecipeSerializer, RecipeGETSerializer
 from .models import Recipe, ShoppingCart, Favorited
 from recipe.filters import RecipeFilter, FavoritedFilterBackend
@@ -30,7 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthorOrReadOnly, ]
     filterset_class = RecipeFilter
     pagination_class = PageNumberPagination
-    filter_backends = [FavoritedFilterBackend]
+    filter_backends = [FavoritedFilterBackend, DjangoFilterBackend]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -124,17 +125,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if not shopping_cart:
             return Response({'message': 'Ваш список покупок пуст.'},
                             status=HTTP_204_NO_CONTENT)
-        recipes = shopping_cart.recipes.all()
-        ingredients_summary = (
-            recipes.values('ingredients__name',
-                           'ingredients__measurement_unit')
-            .annotate(total_quantity=Sum('shopping_carts__amount'))
-        )
-        title = 'Список покупок'
+        recipes = shopping_cart.recipes.all().prefetch_related(
+            'recipe_with_ingredient')
+        ingredients_summary = {}
+        for recipe in recipes:
+            for ingredient in recipe.recipe_with_ingredient.all():
+                ingredient_name = ingredient.ingredient.name
+                total_quantity = ingredient.amount
+                if ingredient_name in ingredients_summary:
+                    ingredients_summary[
+                        ingredient_name]['total_quantity'] += total_quantity
+                else:
+                    ingredients_summary[ingredient_name] = {
+                        'ingredients__name': ingredient.ingredient.name,
+                        'ingredients__measurement_unit':
+                        ingredient.ingredient.measurement_unit,
+                        'total_quantity': total_quantity
+                    }
+        ingredient_total = list(ingredients_summary.values())
+
+        title = f'Список покупок - {self.request.user}'
         pdfmetrics.registerFont(
-            TTFont
-            ('Ubuntu',
-             'D:/Dev/foodgram-project-react/backend/recipe/fonts/Ubuntu-R.ttf')
+            TTFont('Ubuntu', '/app/recipe/fonts/Ubuntu-R.ttf')
         )
         X = 40
         Y = 400
@@ -145,8 +157,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         pdf.setTitle(title)
         text = pdf.beginText(X, Y)
         text.setFont('Ubuntu', FONT_SIZE)
-        text.setFillColor(colors.orchid)
-        for ingredient in ingredients_summary:
+        text.setFillColor(colors.black)
+        for ingredient in ingredient_total:
             ingredient_name = ingredient['ingredients__name']
             measurement_unit = ingredient['ingredients__measurement_unit']
             total_quantity = ingredient['total_quantity']

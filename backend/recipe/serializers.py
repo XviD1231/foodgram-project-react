@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from recipe.base64_decoder import Base64ImageField
 from recipe.models import Recipe, RecipeInIngredient, ShoppingCart, Favorited
-from ingredients.serializers import IngredientSerializer
 from tags.serializers import TagSerializer
 from user.serializers import UserSerializer
 from ingredients.models import Ingredient
@@ -13,7 +12,7 @@ class RecipeIngredientSerializer(serializers.Serializer):
         queryset=Ingredient.objects.all())
 
     class Meta:
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = ('id', 'amount')
 
     def to_internal_value(self, data):
         ingredient_id = data['id']
@@ -85,7 +84,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeGETSerializer(serializers.ModelSerializer):
     """ Сериализатор рецептов. """
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = serializers.SerializerMethodField(read_only=True)
     author = UserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     image = Base64ImageField()
@@ -104,6 +103,20 @@ class RecipeGETSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return Favorited.objects.filter(
                 user=request.user, recipe=obj).exists()
+
+    def get_ingredients(self, obj):
+        ingredients_data = RecipeInIngredient.objects.filter(recipe=obj)
+        ingredients = []
+        for ingredient_data in ingredients_data:
+            ingredient = Ingredient.objects.get(
+                pk=ingredient_data.ingredient.pk)
+            ingredients.append({
+                'id': ingredient.pk,
+                'name': ingredient.name,
+                'measurement_unit': ingredient.measurement_unit,
+                'amount': ingredient_data.amount
+            })
+        return ingredients
 
     class Meta:
         model = Recipe

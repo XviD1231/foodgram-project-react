@@ -1,6 +1,7 @@
 from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework import filters
+from ingredients.filters import IngredientFilter
 from rest_framework.response import Response
 from user.permissions import IsAuthorOrReadOnly
 from ingredients.serializers import IngredientSerializer
@@ -12,8 +13,8 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = [IsAuthorOrReadOnly, ]
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('^name', )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientFilter
     pagination_class = None
 
     @action(detail=False, methods=['get'], url_path='ingredients')

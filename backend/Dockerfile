@@ -11,4 +11,7 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 COPY . .
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8070", "foodgram.wsgi"]
+COPY ./recipe/fonts ./recipe
+
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram.wsgi"]
