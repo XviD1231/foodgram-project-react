@@ -98,7 +98,7 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
-          context: /infra
+          context: ./infra/
           push: true
           tags: xvid1231/foodgram_gateway:latest
 
