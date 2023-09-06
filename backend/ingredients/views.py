@@ -1,12 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from ingredients.filters import IngredientFilter
+from ingredients.models import Ingredient
+from ingredients.serializers import IngredientSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from user.permissions import IsAuthorOrReadOnly
-from ingredients.filters import IngredientFilter
-from ingredients.models import Ingredient
-from ingredients.serializers import IngredientSerializer
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

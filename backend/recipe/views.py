@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from recipe.filters import FavoritedFilterBackend, RecipeFilter
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -14,9 +15,8 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
                                    HTTP_403_FORBIDDEN)
-
-from recipe.filters import FavoritedFilterBackend, RecipeFilter
 from user.permissions import IsAuthorOrReadOnly
+
 from .models import Favorited, Recipe, ShoppingCart
 from .serializers import RecipeGETSerializer, RecipeSerializer
 
