@@ -7,7 +7,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
-
 from user.models import Subscription, User
 from user.serializers import (SetPasswordSerializer, SubscriptionSerializer,
                               TokenCustomSerializer, UserSerializer)

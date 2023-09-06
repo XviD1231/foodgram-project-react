@@ -1,10 +1,10 @@
 from recipe.base64_decoder import Base64ImageField
 from rest_framework import serializers
-from ingredients.models import Ingredient
-from tags.models import Tag
-from recipe.models import Favorited, Recipe, RecipeInIngredient, ShoppingCart
 from tags.serializers import TagSerializer
 from user.serializers import UserSerializer
+from tags.models import Tag
+from ingredients.models import Ingredient
+from recipe.models import Favorited, Recipe, RecipeInIngredient, ShoppingCart
 
 
 class RecipeIngredientSerializer(serializers.Serializer):
