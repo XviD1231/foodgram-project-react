@@ -28,4 +28,4 @@ class Command(BaseCommand):
                     )
                     self.stdout.write(self.style.SUCCESS(
                         f'Успешно добавлен в БД ингредиент: {name}')
-                        )
+                    )

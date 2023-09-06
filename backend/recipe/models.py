@@ -49,7 +49,7 @@ class RecipeInIngredient(models.Model):
                                    related_name='ingredients_in_recipe',
                                    on_delete=models.CASCADE)
     amount = models.IntegerField(verbose_name='Кол-во', validators=[
-                                            MinValueValidator(1)])
+                                 MinValueValidator(1)])
 
     class Meta:
         unique_together = ['recipe', 'ingredient']
