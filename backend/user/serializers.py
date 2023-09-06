@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from user.services import SubscribtionService
+
 from user.models import User
+from user.services import SubscribtionService
 
 
 class UserSerializer(serializers.ModelSerializer):

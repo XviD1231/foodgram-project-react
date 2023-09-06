@@ -1,7 +1,7 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from ingredients.models import Ingredient
 from tags.models import Tag
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Recipe(models.Model):

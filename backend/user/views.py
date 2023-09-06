@@ -1,19 +1,16 @@
 from django.contrib.auth import authenticate
-from rest_framework.response import Response
 from rest_framework import viewsets
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
-)
-from user.serializers import (UserSerializer, SubscriptionSerializer,
-                              TokenCustomSerializer, SetPasswordSerializer)
-from user.models import User, Subscription
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
+
+from user.models import Subscription, User
+from user.serializers import (SetPasswordSerializer, SubscriptionSerializer,
+                              TokenCustomSerializer, UserSerializer)
 from user.services import SubscribtionService
 
 

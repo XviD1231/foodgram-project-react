@@ -1,26 +1,25 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK,
-                                   HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT,
-                                   HTTP_400_BAD_REQUEST,
-                                   HTTP_403_FORBIDDEN)
-
-from .serializers import RecipeSerializer, RecipeGETSerializer
-from .models import Recipe, ShoppingCart, Favorited
-from recipe.filters import RecipeFilter, FavoritedFilterBackend
-from user.permissions import IsAuthorOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
+                                   HTTP_403_FORBIDDEN)
+from user.permissions import IsAuthorOrReadOnly
+
+from recipe.filters import FavoritedFilterBackend, RecipeFilter
+
+from .models import Favorited, Recipe, ShoppingCart
+from .serializers import RecipeGETSerializer, RecipeSerializer
 
 # В основном все прописываю через декораторы.
 # Это касается не только вьюсетов Рецептов но и остального.

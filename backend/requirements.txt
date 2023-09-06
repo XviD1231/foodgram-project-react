@@ -8,6 +8,7 @@ colorama==0.4.6
 cryptography==41.0.3
 defusedxml==0.7.1
 Django==3.2
+django-clearcache==1.2.1
 django-cors-headers==4.2.0
 django-filter==23.2
 django-templated-mail==1.1.1
@@ -17,11 +18,14 @@ djoser==2.2.0
 flake8==6.0.0
 idna==3.4
 iniconfig==2.0.0
+isort==6.0.0b2
 mccabe==0.7.0
 oauthlib==3.2.2
 packaging==23.1
 Pillow==10.0.0
 pluggy==0.13.1
+psycopg2==2.9.7
+psycopg2-binary==2.9.7
 py==1.11.0
 pycodestyle==2.10.0
 pycparser==2.21
@@ -42,5 +46,3 @@ social-auth-core==4.4.2
 sqlparse==0.4.4
 toml==0.10.2
 urllib3==1.26.15
-psycopg2==2.9.7
-psycopg2-binary==2.9.7
