@@ -72,11 +72,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }} 
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Push and build nginx Docker image to DockerHub
-        run: docker-compose -f docker-compose.yml build nginx && docker-compose -f docker-compose.yml push nginx
-        with:
-          context: ./infra/
-          push: true
-          tags: xvid1231/foodgram_gateway:latest
+        run: |
+          DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml build --build-arg TAGS=xvid1231/foodgram_gateway nginx
+          docker-compose -f docker-compose.yml push nginx
 
   build_frontend_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
