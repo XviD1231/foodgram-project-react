@@ -36,7 +36,7 @@ services:
   nginx:
     image: nginx:1.19.3
     env_file: .env
-    ports:
+    ports:s
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
