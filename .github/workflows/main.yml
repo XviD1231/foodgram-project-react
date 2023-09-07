@@ -113,8 +113,10 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        command_timeout: 200m
         script: |
           cd foodgram-project-react
+          sudo docker system prune -af
           sudo docker compose -f docker-compose.yml pull
           sudo docker compose -f docker-compose.yml down
           sudo docker compose -f docker-compose.yml up -d
