@@ -41,20 +41,20 @@ jobs:
         python -m flake8 backend/
   
   build_and_push_nginx_from_docker_hub:
-  name: Pull and push Nginx image from DockerHub
-  runs-on: ubuntu-latest
-  steps:
-    - name: Pull Nginx image
-      run: docker pull nginx:1.19.3 
-    - name: Tag Nginx image
-      run: docker tag nginx:1.19.3 xvid1231/foodgram_nginx:latest  
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Push Nginx image to DockerHub
-      run: docker push xvid1231/foodgram_nginx:latest
+    name: Pull and push Nginx image from DockerHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Nginx image
+        run: docker pull nginx:1.19.3 
+      - name: Tag Nginx image
+        run: docker tag nginx:1.19.3 xvid1231/foodgram_nginx:latest  
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push Nginx image to DockerHub
+        run: docker push xvid1231/foodgram_nginx:latest
 
   build_backend_and_push_to_docker_hub:
     name: Push Docker image to DockerHub
