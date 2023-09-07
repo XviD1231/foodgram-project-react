@@ -98,21 +98,16 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         command_timeout: 200m
         script: |
-          sudo rm -r ./foodgram
-          sudo rm -r ./docs
           cd foodgram-project-react
           sudo docker system prune -af
           sudo docker compose -f docker-compose.yml pull
           sudo docker compose -f docker-compose.yml down
           sudo docker compose -f docker-compose.yml up --build -d
-          sudo docker compose -f docker-compose.yml exec -it backend bash
-          python manage.py makemigrations
-          python manage.py migrate
-          python manage.py collectstatic
-          cp -r /app/collected_static/. /app/backend_static/
-          python manage.py load_data_into_db --csv_path /app/data/ingredients.csv
-          exit
-
+          sudo docker compose -f docker-compose.yml exec backend bash -c "python manage.py makemigrations"
+          sudo docker compose -f docker-compose.yml exec backend -c "python manage.py migrate"
+          sudo docker compose -f docker-compose.yml exec backend -c "python manage.py collectstatic"
+          sudo docker compose -f docker-compose.yml exec backend -c "cp -r /app/collected_static/. /app/backend_static/"
+          sudo docker-compose -f docker-compose.yml exec backend bash -c "python manage.py load_data_into_db --csv_path /app/data/ingredients.csv"
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
