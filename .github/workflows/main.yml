@@ -82,6 +82,11 @@ jobs:
           sudo docker compose pull
           sudo docker compose down -v
           sudo docker compose up --build -d
+          sudo docker compose -f docker-compose.yml exec backend python manage.py makemigrations
+          sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+          sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+          sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/ ./app/backend_staic/
+          sudo docker compose -f docker-compose.yml exec backend python manage.py load_data_into_db --csv_path /app/data/ingredients.csv
 
   send_message:
     runs-on: ubuntu-latest
