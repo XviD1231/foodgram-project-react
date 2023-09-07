@@ -79,9 +79,9 @@ jobs:
         script: |
           cd foodgram-project-react
           sudo docker system prune -af
-          sudo docker compose -f docker-compose.yml pull
-          sudo docker compose -f docker-compose.yml down -v
-          sudo docker compose -f docker-compose.yml up --build -d
+          sudo docker compose pull
+          sudo docker compose down -v
+          sudo docker compose up --build -d
 
   send_message:
     runs-on: ubuntu-latest
