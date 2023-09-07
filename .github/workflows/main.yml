@@ -62,7 +62,6 @@ jobs:
           tags: xvid1231/foodgram_backend:latest
 
   build_and_push_nginx_to_docker_hub:
-    runs_on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
