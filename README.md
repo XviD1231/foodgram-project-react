@@ -86,3 +86,7 @@ If you have any feedback, please reach out to me at vxvidv@gmail.com
 [![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://github.com/XviD1231?tab=repositories)
 
 
+## Links to site for reviewer
+
+ - [https://foodgram-xvid.servebeer.com](https://foodgram-xvid.servebeer.com)
+ - Superuser ```login: Test```, ```email: sd@sd.sd```, ```password: 1```
